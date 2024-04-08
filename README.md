@@ -9,3 +9,7 @@ Websocket URL Plate Recognition: ws://{server_ip}:9003/data?cam_id={camera_id}&d
 Websocket URL Face Recognition: ws://{server_ip}:8003/data?cam_id={camera_id}&data_type=data
 
 for local host server_ip is 127.0.0.1.
+
+Websocket projects for javascript: https://github.com/joewalnes/reconnecting-websocket
+
+Websocket test in chrome: https://chromewebstore.google.com/detail/simple-websocket-client/pfdhoblngboilpfeibdedpjgfnlcodoo
