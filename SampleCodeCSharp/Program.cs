@@ -17,15 +17,66 @@ namespace SampleCodeCSharp
         static void Main(string[] args)
         {
             // برای اتصال و دریافت دیتا به صورت بلادرنگ و در لحضه از وب سوکت استفاده می کنیم
-            //TestWebSocket();
+            //TestWebSocketPlate();
 
             // اگر بخواهیم حداقل دیتای مربوط به پلاک را دریافت کنیم می توانیم از سوکت نیز استفاده کنیم
             //TestSocket();
 
+            // تست چهره
+            TestWebSocketFace();
+
             Console.WriteLine("https://datamoon.ir");
         }
 
-        private static void TestWebSocket()
+        private static void Dmr_FaceReaderEvent(object sender, TotalFacePacket e)
+        {
+            for (int i = 0; i < e.data.Length; i++)
+            {
+                Console.WriteLine(e.data[i].id);
+
+                // low quality plate
+                CommonHelpers.save_image(e.data[i].image, "face_thumbnail.jpg");
+
+                // get high quality plate and car images
+                string result = MainFaceHelper.GetPersonImage(e.camera_id, e.data[i], "face.jpg");
+                //Console.WriteLine(result);
+                JObject obj = JObject.Parse(result);
+                string base64 = obj["base64"].ToString();
+                CommonHelpers.save_image(base64, "face.jpg");
+
+                result = MainFaceHelper.GetPersonImage(e.camera_id, e.data[i], "person.jpg");
+                obj = JObject.Parse(result);
+                base64 = obj["base64"].ToString();
+                CommonHelpers.save_image(base64, "person.jpg");
+            }
+        }
+
+        private static void TestWebSocketFace()
+        {
+            // آی دی دوربین هایی که میخواهیم دیتای آن ها را دریافت کنیم وارد میکنیم.
+            // این آی دی همان شناسه ای است که در قسمت مدیریت دوربین ها نمایش داده می شود
+            List<string> ids = new List<string>();
+            ids.Add("1");
+
+            // آی پی سرور یا سیستمی که نرم افزار روی آن نصب است
+            string serverIp = "172.16.11.10";
+
+            // به صورت پیش فرض دیتا روی پورت 9003 ارسال می شود و این پورت باید روی سرور باز باشد
+            int websocketPort = 8003;
+
+            // همچنین برای دریافت تصاویر خودرو و پلاک لازم است این پورت نیز باز باشد
+            int imagePort = 8002;
+
+            DMReader.MainFaceHelper dmr = new MainFaceHelper(ids, serverIp, websocketPort, imagePort);
+            dmr.FaceReaderEvent += Dmr_FaceReaderEvent;
+
+            while (true)
+            {
+                Thread.Sleep(1000);
+            }
+        }
+
+        private static void TestWebSocketPlate()
         {
             // آی دی دوربین هایی که میخواهیم دیتای آن ها را دریافت کنیم وارد میکنیم.
             // این آی دی همان شناسه ای است که در قسمت مدیریت دوربین ها نمایش داده می شود
